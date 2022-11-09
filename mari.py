@@ -55,45 +55,6 @@ def save_file():
         return 'file saved on {}'.format(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 
-@app.route('/upload_multipart', methods=['POST'])
-def upload_multipart():
-	print("upload_multipart")
-	print("request={}".format(request))
-	print("request.files={}".format(request.files))
-	file_dict = request.files.to_dict(flat=False)
-	#print("dict={}".format(file_dict))
-	print("data={}".format(request.get_data()))
-
-	'''
-	file is werkzeug.datastructures.FileStorage Object.
-	This object have these member.
-		filename: Uploaded File Name
-		name: Field name of Form
-		headers: HTTP request header information(header object of flask)
-		content_length: content-length of HTTP request
-		mimetype: mimetype
-	'''
-
-	FileStorage = file_dict['test'][0]
-	print("FileStorage={}".format(FileStorage))
-	print("FileStorage.filename={}".format(FileStorage.filename))
-	print("FileStorage.mimetype={}".format(FileStorage.mimetype))
-
-	filename = FileStorage.filename
-	filepath = os.path.join(UPLOAD_DIR, werkzeug.utils.secure_filename(filename))
-	#FileStorage.save(filepath)
-
-	try:
-		FileStorage.save(filepath)
-		responce = {'result':'upload OK'}
-		print("{} uploaded {}, saved as {}".format(request.remote_addr, filename, filepath))
-	except IOError as e:
-		#logging.error("Failed to write file due to IOError %s", str(e))
-		responce = {'result':'upload FAIL'}
-
-	return json.dumps(responce)
-
-
 @app.route("/events", methods=(['DELETE']))
 def delete_event():
     mongo.db.events.remove({})
