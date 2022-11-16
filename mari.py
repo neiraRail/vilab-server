@@ -4,7 +4,7 @@ from bson import json_util, ObjectId
 from werkzeug.utils import secure_filename
 import os
 
-UPLOAD_FOLDER = '/home/vps2/vilab/files'
+UPLOAD_FOLDER = 'files'
 
 app = Flask(__name__)
 app.config['MONGO_URI']='mongodb://localhost:27017/vibration_db'
@@ -37,8 +37,8 @@ def create_event():
 def save_file():
     print("Endpint reached")
     # check if the post request has the file part
-    print(request.get_data())
-    print(request.files)
+    # print(request.get_data())
+    # print(request.files)
     if len(request.files) == 0:
         print("Not file cause len of request.files is equal to 0")
         return 'No fileeee'
