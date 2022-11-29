@@ -33,6 +33,14 @@ def create_event():
     id = mongo.db.events.insert_one(a)
     return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
 
+@app.route("/add")
+def add_event():
+    a = {
+        "a": 1
+    }
+    id = mongo.db.events.insert_one(a)
+    return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
+
 @app.route("/files", methods=(['POST']))
 def save_file():
     print("Endpint reached")
