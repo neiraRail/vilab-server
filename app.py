@@ -13,14 +13,21 @@ app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 
 mongo = PyMongo(app)
 
+@app.route("/")
+def hola():
+    return "Hola como estamo"
+
+@app.route("/status")
+def status():
+    return {
+        "status": "1",
+        "text": "OK" 
+    }
+
 @app.route("/events", methods=(['GET']))
 def get_events():
     events = json_util.dumps(mongo.db.events.find())
     return events
-
-@app.route("/")
-def hola():
-    return "Hola como estamo"
 
 @app.route("/events/<id>", methods=(['GET']))
 def get_event(id):
@@ -33,13 +40,19 @@ def create_event():
     id = mongo.db.events.insert_one(a)
     return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
 
-@app.route("/add")
-def add_event():
-    a = {
-        "a": 1
-    }
-    id = mongo.db.events.insert_one(a)
-    return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
+@app.route("/events", methods=(['DELETE']))
+def delete_event():
+    mongo.db.events.remove({})
+    return 'deleted'
+
+# @app.route("/add")
+# def add_event():
+#     a = {
+#         "a": 1
+#     }
+#     id = mongo.db.events.insert_one(a)
+#     return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
+
 
 @app.route("/files", methods=(['POST']))
 def save_file():
@@ -62,11 +75,6 @@ def save_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return 'file saved on {}'.format(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-
-@app.route("/events", methods=(['DELETE']))
-def delete_event():
-    mongo.db.events.remove({})
-    return 'deleted'
 
 
 if __name__ == "__main__":
