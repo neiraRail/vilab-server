@@ -3,8 +3,8 @@ from flask_pymongo import PyMongo
 from bson import json_util, ObjectId
 from werkzeug.utils import secure_filename
 import os
-
-UPLOAD_FOLDER = 'files'
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'files')
 
 app = Flask(__name__)
 app.config['MONGO_URI']='mongodb://localhost:27017/vibration_db'
