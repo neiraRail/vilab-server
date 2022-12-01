@@ -1,10 +1,19 @@
+import logging
+
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from bson import json_util, ObjectId
 from werkzeug.utils import secure_filename
 import os
+
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'files')
+
+logging.getLogger('werkzeug').disabled = True
+logging.basicConfig(filename="vilab_server.log", 
+                    level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s: %(message)s', 
+                    datefmt='%m/%d/%Y %H:%M:%S')
 
 app = Flask(__name__)
 app.config['MONGO_URI']='mongodb://localhost:27017/vibration_db'
@@ -13,64 +22,78 @@ app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 
 mongo = PyMongo(app)
 
+@app.route("/")
+def hola():
+    return "Hola como estamos"
+
+@app.route("/status")
+def status():
+    logging.info("GET status/ request")
+    return {
+        "estado": "1",
+        "texto": "OK" 
+    }
+
 @app.route("/events", methods=(['GET']))
 def get_events():
+    logging.info("GET events/ request")
     events = json_util.dumps(mongo.db.events.find())
     return events
 
-@app.route("/")
-def hola():
-    return "Hola como estamo"
-
 @app.route("/events/<id>", methods=(['GET']))
 def get_event(id):
+    logging.info("GET events/{} request".format(id))
     return json_util.dumps(mongo.db.events.find_one({'_id': ObjectId(id)}))
 
 @app.route("/events", methods=(['POST']))
 def create_event():
-    #a = {"text": "chao"}
-    a = request.json
-    id = mongo.db.events.insert_one(a)
+    logging.info("POST events/ request")
+    event = request.json
+    id = mongo.db.events.insert_one(event)
     return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
-
-@app.route("/add")
-def add_event():
-    a = {
-        "a": 1
-    }
-    id = mongo.db.events.insert_one(a)
-    return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
-
-@app.route("/files", methods=(['POST']))
-def save_file():
-    print("Endpint reached")
-    # check if the post request has the file part
-    # print(request.get_data())
-    # print(request.files)
-    if len(request.files) == 0:
-        print("Not file cause len of request.files is equal to 0")
-        return 'No fileeee'
-    file = list(request.files.values())[0]
-    # If the user does not select a file, the browser submits an
-    # empty file without a filename.
-    if file.filename == '':
-        print("not file cause file.filename is empty")
-        return 'No fileeeee'
-    if True:
-        print("File and is allowed")
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return 'file saved on {}'.format(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
 
 @app.route("/events", methods=(['DELETE']))
 def delete_event():
     mongo.db.events.remove({})
     return 'deleted'
 
+# @app.route("/add")
+# def add_event():
+#     a = {
+#         "a": 1
+#     }
+#     id = mongo.db.events.insert_one(a)
+#     return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
+
+
+@app.route("/files", methods=(['POST']))
+def save_file():
+    logging.info("POST files/ request")
+    # Checkear si la petición tiene el archivo.
+    if len(request.files) == 0:
+        logging.info("files/ : Largo de request.files es igual a 0")
+        return 'No hay archivo'
+    file = list(request.files.values())[0]
+    # Hay casos en que se se envía un archivo vacío sin un filename
+    if file.filename == '':
+        logging.info("files/ : file.filename está vacío")
+        return 'No hay archivo'
+    logging.info("Hay un archivo de nombre: {}".format(file.filename))
+    if allowed_file(file.filename):
+        logging.info("La extensión del archivo es aceptada")
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return 'Archivo guardado en {}'.format(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    else:
+        logging.info("La extensión del archivo no está permitida")
+        return 'Extensión no permitida'
+
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    logging.info("Servidor funcionando")
+    app.run(host="0.0.0.0", port=8080, debug=False)
+
 
 
 
