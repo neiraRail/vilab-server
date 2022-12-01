@@ -6,7 +6,12 @@ from bson import json_util, ObjectId
 from werkzeug.utils import secure_filename
 import os
 
-logging.basicConfig(filename="vilab_server.log", level=logging.INFO)
+
+logging.getLogger('werkzeug').disabled = True
+logging.basicConfig(filename="vilab_server.log", 
+                    level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s: %(message)s', 
+                    datefmt='%m/%d/%Y %H:%M:%S')
 
 
 UPLOAD_FOLDER = 'files'
@@ -87,7 +92,9 @@ def save_file():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    logging.info("Servidor funcionando")
+    app.run(host="0.0.0.0", port=8080, debug=False)
+    
 
 
 
