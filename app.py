@@ -10,7 +10,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'files')
 
 logging.getLogger('werkzeug').disabled = True
-logging.basicConfig(filename="vilab_server.log", 
+logging.basicConfig(filename="logs/vilab_server.log", 
                     level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s: %(message)s', 
                     datefmt='%m/%d/%Y %H:%M:%S')
