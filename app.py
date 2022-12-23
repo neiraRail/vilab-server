@@ -22,10 +22,6 @@ app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 
 mongo = PyMongo(app)
 
-@app.route("/")
-def hola():
-    return "Hola como estamos"
-
 @app.route("/status")
 def status():
     logging.info("GET status/ request")
