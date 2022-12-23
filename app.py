@@ -88,18 +88,15 @@ def save_file():
         logging.info("La extensión del archivo no está permitida")
         return 'Extensión no permitida'
 
+ALLOWED_EXTENSIONS = ['txt']
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 
 if __name__ == "__main__":
     logging.info("Servidor funcionando")
     app.run(host="0.0.0.0", port=8080, debug=False)
     logging.info("Servidor finalizado")
-
-
-
-
-ALLOWED_EXTENSIONS = ['txt']
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
