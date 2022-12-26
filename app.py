@@ -45,8 +45,14 @@ def get_event(id):
 def create_event():
     logging.info("POST events/ request")
     event = request.json
-    id = mongo.db.events.insert_one(event)
-    return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
+    
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], 'nuevo'), "w") as myfile:    
+        for data in event:
+            myfile.write(str(data))
+            myfile.write("\n")
+    # id = mongo.db.events.insert_one(event)
+    # return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
+    return 'OK'
 
 @app.route("/events", methods=(['DELETE']))
 def delete_event():
@@ -94,5 +100,5 @@ def allowed_file(filename):
 
 if __name__ == "__main__":
     logging.info("Servidor funcionando")
-    app.run(host="0.0.0.0", port=8080, debug=False)
+    app.run(host="0.0.0.0", port=8080, debug=True)
     logging.info("Servidor finalizado")
