@@ -16,7 +16,7 @@ logging.basicConfig(filename="logs/vilab_server.log",
                     datefmt='%m/%d/%Y %H:%M:%S')
 
 app = Flask(__name__)
-app.config['MONGO_URI']='mongodb://localhost:27017/vibration_db'
+app.config['MONGO_URI']='mongodb://172.17.0.1:27017/vibration_db'
 app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 
 
