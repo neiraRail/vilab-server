@@ -10,18 +10,17 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'files')
 
 # logging.getLogger('werkzeug').disabled = True
-'''
 logging.basicConfig(filename="logs/vilab_server.log", 
                     level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s: %(message)s', 
                     datefmt='%m/%d/%Y %H:%M:%S')
-'''
+
 app = Flask(__name__)
-#app.config['MONGO_URI']='mongodb://172.17.0.1:27017/vibration_db'
-#app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
+app.config['MONGO_URI']='mongodb://172.17.0.1:27017/vibration_db'
+app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 
 
-#mongo = PyMongo(app)
+mongo = PyMongo(app)
 
 @app.route("/status")
 def status():
@@ -30,7 +29,7 @@ def status():
         "estado": "1",
         "texto": "OK" 
     }
-'''
+
 @app.route("/events", methods=(['GET']))
 def get_events():
     logging.info("GET events/ request")
@@ -97,9 +96,9 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-'''
+
 
 if __name__ == "__main__":
-    #logging.info("Servidor funcionando")
+    logging.info("Servidor funcionando")
     app.run(host="0.0.0.0", port=8080, debug=True)
-    #logging.info("Servidor finalizado")
+    logging.info("Servidor finalizado")
