@@ -45,6 +45,9 @@ def get_event(id):
 def create_event():
     logging.info("POST events/ request")
     event = request.json
+    if(not validar_evento(event)){
+        return 'Formato de json no válido'
+    }
     
     with open(os.path.join(app.config['UPLOAD_FOLDER'], 'nuevo'), "w") as myfile:    
         for data in event:
