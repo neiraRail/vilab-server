@@ -1,4 +1,4 @@
-from server.app import validar_vector
+from src.app import validar_vector
 
 def test_vector_vacio():
     assert validar_vector({}) == False

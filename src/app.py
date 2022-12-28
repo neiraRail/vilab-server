@@ -6,7 +6,7 @@ from bson import json_util, ObjectId
 from werkzeug.utils import secure_filename
 import os
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'files')
 
 # logging.getLogger('werkzeug').disabled = True
@@ -49,8 +49,8 @@ def create_event():
         return 'Formato de json no válido'
     
     
-    with open(os.path.join(app.config['UPLOAD_FOLDER'], 'nuevo'), "w") as myfile:    
-        for data in event:
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], event['filename']), "w") as myfile:    
+        for data in event['data']:
             myfile.write(str(data))
             myfile.write("\n")
     # id = mongo.db.events.insert_one(event)

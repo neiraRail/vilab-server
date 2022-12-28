@@ -1,4 +1,4 @@
-from server.app import validar_evento
+from src.app import validar_evento
 
 def test_no_es_dict():
     event1 = ''
