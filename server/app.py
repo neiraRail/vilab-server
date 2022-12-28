@@ -45,9 +45,9 @@ def get_event(id):
 def create_event():
     logging.info("POST events/ request")
     event = request.json
-    if(not validar_evento(event)){
+    if not validar_evento(event):
         return 'Formato de json no válido'
-    }
+    
     
     with open(os.path.join(app.config['UPLOAD_FOLDER'], 'nuevo'), "w") as myfile:    
         for data in event:
@@ -61,14 +61,6 @@ def create_event():
 def delete_event():
     mongo.db.events.remove({})
     return 'deleted'
-
-# @app.route("/add")
-# def add_event():
-#     a = {
-#         "a": 1
-#     }
-#     id = mongo.db.events.insert_one(a)
-#     return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
 
 
 @app.route("/files", methods=(['POST']))
@@ -98,6 +90,36 @@ ALLOWED_EXTENSIONS = ['txt']
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def validar_evento(evento):
+    if type(evento) is not dict:
+        return False
+    if 'filename' not in evento:
+        return False
+    if 'data' not in evento:
+        return False
+    if type(evento['data']) is not list:
+        return False
+    if len(evento['data']) == 0:
+        return False
+    if type(evento['filename']) is not str:
+        return False
+    
+    for vector in evento['data']:
+        if not validar_vector(vector):
+            return False
+    return True
+
+def validar_vector(vector):
+    if not vector:
+        return False
+    if set(vector.keys()) != set(['time', 'acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'temp']):
+        return False
+    if not all([type(value) is float for key, value in vector.items()]):
+        return False
+    return True
+
+
 
 
 
