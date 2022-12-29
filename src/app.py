@@ -48,14 +48,14 @@ def create_event():
     if not validar_evento(event):
         return 'Formato de json no válido'
     
-    
-    with open(os.path.join(app.config['UPLOAD_FOLDER'], event['filename']), "w") as myfile:    
-        for data in event['data']:
-            myfile.write(str(data))
-            myfile.write("\n")
-    # id = mongo.db.events.insert_one(event)
-    # return json_util.dumps(mongo.db.events.find_one({'_id': id.inserted_id}))
-    return 'OK'
+    mongo.db[event['filename']].delete_many({})
+    mongo.db[event['filename']].insert_many(event['data'])
+
+    # with open(os.path.join(app.config['UPLOAD_FOLDER'], event['filename']), "w") as myfile:    
+    #     for data in event['data']:
+    #         myfile.write(str(data))
+    #         myfile.write("\n")
+    return 'Ingresados {} registros'.format(len(event['data']))
 
 @app.route("/events", methods=(['DELETE']))
 def delete_event():
