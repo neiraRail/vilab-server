@@ -140,9 +140,11 @@ def validar_vector(vector):
         return False
     if not vector:
         return False
-    if set(vector.keys()) != set(['time_lap', 'node', 'event', 'acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z', 'mag_x', 'mag_y', 'mag_z', 'temp']):
+    if set(vector.keys()) != set(['time_lap', 'time', 'node', 'event', 'acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z', 'mag_x', 'mag_y', 'mag_z', 'temp']):
         return False
-    if not all([type(value) is float or type(value) is int  for key, value in vector.items()]):
+    if not all([type(value) is float or type(value) is int  for key, value in vector.items() if key != 'time']):
+        return False
+    if type(vector['time']) is not str:
         return False
     return True
     

@@ -2,7 +2,8 @@ from src.app import validar_vector
 
 def test_vector_correcto():
     vector = {
-        'time_lap': 665903, 
+        'time_lap': 665903,
+        'time': '2023-01-06 15:49:22.119596', 
         'node': 1, 
         'event': 4, 
         'acc_x': -0.39, 
