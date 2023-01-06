@@ -1,4 +1,4 @@
-from src.app import validar_evento
+from src.app import validar_evento_old as validar_evento
 
 def test_no_es_dict():
     event1 = ''
@@ -45,6 +45,17 @@ def test_sin_datos_en_data():
     event = {
         'data': [],
         'filename': ''
+    }
+    assert validar_evento(event) == False
+
+def test_sin_vectores():
+    event = {
+        'filename': 'nombre',
+        'time_start': 'timestamp',
+        'data': [
+            2,
+            3
+        ] 
     }
     assert validar_evento(event) == False
 

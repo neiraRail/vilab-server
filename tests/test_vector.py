@@ -1,24 +1,19 @@
 from src.app import validar_vector
 
-def test_vector_vacio():
-    assert validar_vector({}) == False
-
-def test_vector_sin_atributos_necesarios():
+def test_vector_correcto():
     vector = {
-        'hola':1
+        'time_lap': 665903, 
+        'node': 1, 
+        'event': 4, 
+        'acc_x': -0.39, 
+        'acc_y': 1.89, 
+        'acc_z': -10.41, 
+        'gyr_x': 13.17, 
+        'gyr_y': -1.13, 
+        'gyr_z': -1.33, 
+        'mag_x': -150.9, 
+        'mag_y': 12.3, 
+        'mag_z': -86.1, 
+        'temp': 33.94
     }
-    assert validar_vector(vector) == False
-
-def test_vector_sin_tipos_correctos():
-    vector = {
-        'time'  : 'hola',
-        'acc_x' : 1,
-        'acc_y' : 1,
-        'acc_z' : 1,
-        'gyro_x': 1,
-        'gyro_y': 1,
-        'gyro_z': 1,
-        'temp'  : 1
-    }
-    assert validar_vector(vector) == False
-
+    assert validar_vector(vector) == True

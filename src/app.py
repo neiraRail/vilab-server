@@ -41,11 +41,11 @@ def get_event(id):
     logging.info("GET events/{} request".format(id))
     return json_util.dumps(mongo.db.events.find_one({'_id': ObjectId(id)}))
 
-@app.route("/events", methods=(['POST']))
+@app.route("/events_old", methods=(['POST']))
 def create_event():
-    logging.info("POST events/ request")
+    logging.info("POST events_old/ request")
     event = request.json
-    if not validar_evento(event):
+    if not validar_evento_old(event):
         return 'Formato de json no válido'
     
     mongo.db[event['filename']].delete_many({})
@@ -56,6 +56,18 @@ def create_event():
     #         myfile.write(str(data))
     #         myfile.write("\n")
     return 'Ingresados {} registros'.format(len(event['data']))
+
+@app.route("/events", methods=(["POST"]))
+def create_event_jota():
+    logging.info("POST events/ request")
+    event = request.json
+    if not validar_vector(event):
+        return 'Formato de json no válido'
+
+    mongo.db.datos.insert_one(event)
+    return 'ok'
+
+
 
 @app.route("/events", methods=(['DELETE']))
 def delete_event():
@@ -91,7 +103,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def validar_evento(evento):
+def validar_evento_old(evento):
     if type(evento) is not dict:
         return False
     if 'filename' not in evento:
@@ -106,11 +118,13 @@ def validar_evento(evento):
         return False
     
     for vector in evento['data']:
-        if not validar_vector(vector):
+        if not validar_vector_old(vector):
             return False
     return True
 
-def validar_vector(vector):
+def validar_vector_old(vector):
+    if type(vector) is not dict:
+        return False
     if not vector:
         return False
     if set(vector.keys()) != set(['time', 'acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'temp']):
@@ -118,6 +132,20 @@ def validar_vector(vector):
     if not all([type(value) is float for key, value in vector.items()]):
         return False
     return True
+
+def validar_vector(vector):
+    if type(vector) is not dict:
+        return False
+    if not vector:
+        return False
+    if set(vector.keys()) != set(['time_lap', 'node', 'event', 'acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z', 'mag_x', 'mag_y', 'mag_z', 'temp']):
+        return False
+    if not all([type(value) is float or type(value) is int  for key, value in vector.items()]):
+        return False
+    return True
+    
+    
+
 
 
 
