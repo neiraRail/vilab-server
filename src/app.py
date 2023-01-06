@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from bson import json_util, ObjectId
 from werkzeug.utils import secure_filename
+from datetime import datetime
 import os
 
 APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -61,6 +62,7 @@ def create_event():
 def create_event_jota():
     logging.info("POST events/ request")
     event = request.json
+    event['time'] = datetime.now()
     if not validar_vector(event):
         return 'Formato de json no válido'
 
