@@ -62,7 +62,7 @@ def create_event():
 def create_event_jota():
     logging.info("POST events/ request")
     event = request.json
-    event['time'] = datetime.now()
+    event['time'] = str(datetime.now())
     if not validar_vector(event):
         return 'Formato de json no válido'
 
@@ -136,6 +136,7 @@ def validar_vector_old(vector):
     return True
 
 def validar_vector(vector):
+    print(vector)
     if type(vector) is not dict:
         return False
     if not vector:
