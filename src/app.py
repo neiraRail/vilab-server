@@ -99,7 +99,7 @@ def save_file():
         logging.info("La extensión del archivo no está permitida")
         return 'Extensión no permitida'
 
-ALLOWED_EXTENSIONS = ['txt']
+ALLOWED_EXTENSIONS = ['txt', 'json']
 
 def allowed_file(filename):
     return '.' in filename and \
