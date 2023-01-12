@@ -5,6 +5,7 @@ WORKDIR /python-docker
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 RUN mkdir logs/
+RUN mkdir files/
 
 COPY . .
 ENV FLASK_APP=src/app.py
