@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 import time
 from flask import Flask, request
-from database import mongo
+from database import db as mongo
 from werkzeug.utils import secure_filename
 import os
 
@@ -22,11 +22,16 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/vibration_db"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MONGODB_SETTINGS"] = {
+    "db": "vibration_db",
+    "host": "localhost",
+    "port": 27017,
+}
+# app.config["MONGO_URI"] = "mongodb://localhost:27017/vibration_db"
+# app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 app.register_blueprint(events_blueprint, url_prefix="/eventos")
-app.register_blueprint(nodes_blueprint, url_prefix="/nodes")
+app.register_blueprint(nodes_blueprint, url_prefix="/nodos")
 
 mongo.init_app(app)
 
@@ -122,44 +127,6 @@ def validar_vector_old(vector):
     ):
         return False
     if not all([type(value) is float for key, value in vector.items()]):
-        return False
-    return True
-
-
-def validar_vector(vector):
-    print(vector)
-    if type(vector) is not dict:
-        return False
-    if not vector:
-        return False
-    if set(vector.keys()) != set(
-        [
-            "time_lap",
-            "time",
-            "node",
-            "event",
-            "acc_x",
-            "acc_y",
-            "acc_z",
-            "gyr_x",
-            "gyr_y",
-            "gyr_z",
-            "mag_x",
-            "mag_y",
-            "mag_z",
-            "temp",
-        ]
-    ):
-        return False
-    if not all(
-        [
-            type(value) is float or type(value) is int
-            for key, value in vector.items()
-            if key != "time"
-        ]
-    ):
-        return False
-    if type(vector["time"]) is not str:
         return False
     return True
 
