@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
-import time
 from datetime import datetime
 import logging
-from models.event import Event
+import time
+
+from src.models.event import Event
 
 bp = Blueprint(
     "events",
