@@ -8,6 +8,6 @@ RUN mkdir logs/
 RUN mkdir files/
 
 COPY . .
-ENV FLASK_APP=src/app.py
+ENV FLASK_APP=app.py
 
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
