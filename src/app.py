@@ -1,139 +1,122 @@
 import logging
-
-from flask import Flask, jsonify, request
-from flask_pymongo import PyMongo
-from bson import json_util, ObjectId
+from flask import Flask, request
+from database import mongo
 from werkzeug.utils import secure_filename
-from datetime import datetime
 import os
 
+
+from events import bp as events_blueprint
+from nodes import bp as nodes_blueprint
+
 APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'files')
+UPLOAD_FOLDER = os.path.join(APP_ROOT, "files")
 
 # logging.getLogger('werkzeug').disabled = True
-logging.basicConfig(filename="logs/vilab_server.log", 
-                    level=logging.INFO, 
-                    format='%(asctime)s - %(levelname)s: %(message)s', 
-                    datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(
+    filename="logs/vilab_server.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %H:%M:%S",
+)
 
 app = Flask(__name__)
-app.config['MONGO_URI']='mongodb://localhost:27017/vibration_db'
-app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
+app.config["MONGO_URI"] = "mongodb://localhost:27017/vibration_db"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+app.register_blueprint(events_blueprint, url_prefix="/eventos")
+app.register_blueprint(nodes_blueprint, url_prefix="/nodes")
 
-mongo = PyMongo(app)
+mongo.init_app(app)
+
 
 @app.route("/status")
 def status():
     logging.info("GET status/ request")
-    return {
-        "estado": "1",
-        "texto": "OK" 
-    }
+    return {"estado": "1", "texto": "OK"}
 
-@app.route("/events", methods=(['GET']))
-def get_events():
-    logging.info("GET events/ request")
-    events = json_util.dumps(mongo.db.events.find())
-    return events
 
-@app.route("/events/<id>", methods=(['GET']))
-def get_event(id):
-    logging.info("GET events/{} request".format(id))
-    return json_util.dumps(mongo.db.events.find_one({'_id': ObjectId(id)}))
-
-@app.route("/events_old", methods=(['POST']))
+@app.route("/events_old", methods=(["POST"]))
 def create_event():
     logging.info("POST events_old/ request")
     event = request.json
     if not validar_evento_old(event):
-        return 'Formato de json no válido'
-    
-    mongo.db[event['filename']].delete_many({})
-    mongo.db[event['filename']].insert_many(event['data'])
+        return "Formato de json no válido"
 
-    # with open(os.path.join(app.config['UPLOAD_FOLDER'], event['filename']), "w") as myfile:    
+    mongo.db[event["filename"]].delete_many({})
+    mongo.db[event["filename"]].insert_many(event["data"])
+
+    # with open(os.path.join(app.config['UPLOAD_FOLDER'], event['filename']), "w") as myfile:
     #     for data in event['data']:
     #         myfile.write(str(data))
     #         myfile.write("\n")
-    return 'Ingresados {} registros'.format(len(event['data']))
-
-@app.route("/events", methods=(["POST"]))
-def create_event_jota():
-    logging.info("POST events/ request")
-    event = request.json
-    event['time'] = str(datetime.now())
-    if not validar_vector(event):
-        return 'Formato de json no válido'
-
-    mongo.db.datos.insert_one(event)
-    return 'ok'
+    return "Ingresados {} registros".format(len(event["data"]))
 
 
-
-@app.route("/events", methods=(['DELETE']))
-def delete_event():
-    mongo.db.events.remove({})
-    return 'deleted'
-
-
-@app.route("/files", methods=(['POST']))
+@app.route("/files", methods=(["POST"]))
 def save_file():
     logging.info("POST files/ request")
     # Checkear si la petición tiene el archivo.
     if len(request.files) == 0:
         logging.info("files/ : Largo de request.files es igual a 0")
-        return 'No hay archivo'
+        return "No hay archivo"
     file = list(request.files.values())[0]
     # Hay casos en que se se envía un archivo vacío sin un filename
-    if file.filename == '':
+    if file.filename == "":
         logging.info("files/ : file.filename está vacío")
-        return 'No hay archivo'
+        return "No hay archivo"
     logging.info("Hay un archivo de nombre: {}".format(file.filename))
     if allowed_file(file.filename):
         logging.info("La extensión del archivo es aceptada")
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return 'Archivo guardado en {}'.format(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        return "Archivo guardado en {}".format(
+            os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        )
     else:
         logging.info("La extensión del archivo no está permitida")
-        return 'Extensión no permitida'
+        return "Extensión no permitida"
 
-ALLOWED_EXTENSIONS = ['txt', 'json']
+
+ALLOWED_EXTENSIONS = ["txt", "json"]
+
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def validar_evento_old(evento):
     if type(evento) is not dict:
         return False
-    if 'filename' not in evento:
+    if "filename" not in evento:
         return False
-    if 'data' not in evento:
+    if "data" not in evento:
         return False
-    if type(evento['data']) is not list:
+    if type(evento["data"]) is not list:
         return False
-    if len(evento['data']) == 0:
+    if len(evento["data"]) == 0:
         return False
-    if type(evento['filename']) is not str:
+    if type(evento["filename"]) is not str:
         return False
-    
-    for vector in evento['data']:
+
+    for vector in evento["data"]:
         if not validar_vector_old(vector):
             return False
     return True
+
 
 def validar_vector_old(vector):
     if type(vector) is not dict:
         return False
     if not vector:
         return False
-    if set(vector.keys()) != set(['time', 'acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'temp']):
+    if set(vector.keys()) != set(
+        ["time", "acc_x", "acc_y", "acc_z", "gyro_x", "gyro_y", "gyro_z", "temp"]
+    ):
         return False
     if not all([type(value) is float for key, value in vector.items()]):
         return False
     return True
+
 
 def validar_vector(vector):
     print(vector)
@@ -141,19 +124,36 @@ def validar_vector(vector):
         return False
     if not vector:
         return False
-    if set(vector.keys()) != set(['time_lap', 'time', 'node', 'event', 'acc_x', 'acc_y', 'acc_z', 'gyr_x', 'gyr_y', 'gyr_z', 'mag_x', 'mag_y', 'mag_z', 'temp']):
+    if set(vector.keys()) != set(
+        [
+            "time_lap",
+            "time",
+            "node",
+            "event",
+            "acc_x",
+            "acc_y",
+            "acc_z",
+            "gyr_x",
+            "gyr_y",
+            "gyr_z",
+            "mag_x",
+            "mag_y",
+            "mag_z",
+            "temp",
+        ]
+    ):
         return False
-    if not all([type(value) is float or type(value) is int  for key, value in vector.items() if key != 'time']):
+    if not all(
+        [
+            type(value) is float or type(value) is int
+            for key, value in vector.items()
+            if key != "time"
+        ]
+    ):
         return False
-    if type(vector['time']) is not str:
+    if type(vector["time"]) is not str:
         return False
     return True
-    
-    
-
-
-
-
 
 
 if __name__ == "__main__":
