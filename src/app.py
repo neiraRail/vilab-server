@@ -1,4 +1,6 @@
 import logging
+from datetime import datetime
+import time
 from flask import Flask, request
 from database import mongo
 from werkzeug.utils import secure_filename
@@ -33,6 +35,12 @@ mongo.init_app(app)
 def status():
     logging.info("GET status/ request")
     return {"estado": "1", "texto": "OK"}
+
+
+@app.route("/time")
+def time_unix():
+    d = datetime.now()
+    return {"time": time.mktime(d.timetuple())}
 
 
 @app.route("/events_old", methods=(["POST"]))
