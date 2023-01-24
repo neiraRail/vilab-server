@@ -58,8 +58,10 @@ def create_event():
     mongo.db[event["filename"]].delete_many({})
     mongo.db[event["filename"]].insert_many(event["data"])
 
-    # with open(os.path.join(app.config['UPLOAD_FOLDER'], event['filename']), "w") as myfile:
-    #     for data in event['data']:
+    # with open(
+    #     os.path.join(app.config["UPLOAD_FOLDER"], event["filename"]), "w"
+    # ) as myfile:
+    #     for data in event["data"]:
     #         myfile.write(str(data))
     #         myfile.write("\n")
     return "Ingresados {} registros".format(len(event["data"]))

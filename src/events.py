@@ -43,7 +43,7 @@ def create_event_jota():
 
 @bp.route("/<id>", methods=(["DELETE"]))
 def delete_event(id):
-    logging.info("DELETE eventos/{id} request".format(id))
+    logging.info("DELETE eventos/{} request".format(id))
     evento = Event.objects.get_or_404(id=id)
     evento.delete()
     return jsonify(evento.to_json())
