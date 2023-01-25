@@ -35,7 +35,7 @@ def create_event_jota():
     json["time"] = time.mktime(datetime.now().timetuple())
     resultado = validar_vector(json)
     if not resultado["valido"]:
-        return resultado
+        return resultado, 400
     event = Event(**json)
     event.save()
     return jsonify(event.to_json())
