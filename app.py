@@ -30,8 +30,8 @@ app.config["MONGODB_SETTINGS"] = {
 # app.config["MONGO_URI"] = "mongodb://localhost:27017/vibration_db"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-app.register_blueprint(events_blueprint, url_prefix="/eventos")
-app.register_blueprint(nodes_blueprint, url_prefix="/nodos")
+app.register_blueprint(events_blueprint, url_prefix="/events")
+app.register_blueprint(nodes_blueprint, url_prefix="/nodes")
 
 mongo.init_app(app)
 

@@ -32,12 +32,41 @@ def crear_nodo():
     json = request.json
     validacion = validar_nodo(json)
     if not validacion["valido"]:
-        return validacion["razon"]
+        return validacion, 400
 
     nodo = Node(**json)
     nodo.save()
     return jsonify(nodo.to_json())
 
 
-def validar_nodo():
+def validar_nodo(nodo):
+    if type(nodo) is not dict:
+        return {"valido": False, "razon": "El nodo no es un diccionario"}
+    if not nodo:
+        return {"valido": False, "razon": "El nodo es nulo"}
+    keys = set(
+        [
+            "ssid",
+            "password",
+            "serverREST",
+            "node",
+            "time_event",
+            "delay_sensor",
+            "time_reset",
+            "token",
+        ]
+    )
+    if set(nodo.keys()) != keys:
+        diferencia = [x for x in keys if x not in nodo.keys()]
+        return {
+            "valido": False,
+            "razon": "Al vector le faltan los atributos: " + str(diferencia),
+        }
+    if not all(
+        [type(value) is str or type(value) is int for key, value in nodo.items()]
+    ):
+        return {
+            "valido": False,
+            "razon": "Alguno de los atributos no son str ni int",
+        }
     return {"valido": True, "razon": None}

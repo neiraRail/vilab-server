@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime
-import logging
 import time
+import logging
 
 from src.models.event import Event
 
@@ -10,32 +10,38 @@ bp = Blueprint(
     __name__,
 )
 
+logging.basicConfig(
+    filename="logs/vilab_server.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %H:%M:%S",
+)
 
-@bp.route("/", methods=(["GET"]))
+
+@bp.route("", methods=(["GET"]))
 def get_events():
-    logging.info("GET eventos/ request")
+    logging.info("GET events/ request")
     eventos = Event.objects()
     return jsonify(eventos)
 
 
 @bp.route("/<event>", methods=(["GET"]))
 def get_event(event):
-    logging.info("GET eventos/{} request".format(event))
+    logging.info("GET events/{} request".format(event))
     evento = Event.objects(event=event).first()
     if not evento:
         return jsonify({"error": "evento no encontrado"})
     else:
         return jsonify(evento.to_json())
 
-
-@bp.route("/", methods=(["POST"]))
+@bp.route("", methods=(["POST"]))
 def create_event_jota():
-    logging.info("POST eventos/ request")
+    logging.info("POST events/ request")
     json = request.json
     json["time"] = time.mktime(datetime.now().timetuple())
     resultado = validar_vector(json)
     if not resultado["valido"]:
-        return resultado
+       return resultado, 400
     event = Event(**json)
     event.save()
     return jsonify(event.to_json())
