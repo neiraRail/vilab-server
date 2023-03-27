@@ -7,8 +7,6 @@ import os
 
 from src.models.node import Node
 
-from src.models.node import Node
-
 from src.database import db as mongo
 from src.events import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
