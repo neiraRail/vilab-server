@@ -6,8 +6,6 @@ import time
 import os
 
 
-from src.models.node import Node
-
 from src.database import db as mongo
 from src.events import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
@@ -48,15 +46,6 @@ def status():
 def time_unix():
     d = datetime.now()
     return {"time": time.mktime(d.timetuple())}
-
-
-@app.route("/init", methods=(["POST"]))
-def init():
-    json = request.json
-    if json.has_key("node"):
-        return Node.objects(node=json["node"]).first()
-    else:
-        return "json no contiene 'nodo'", 400
 
 
 @app.route("/events_old", methods=(["POST"]))

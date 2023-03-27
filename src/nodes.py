@@ -9,6 +9,21 @@ bp = Blueprint(
 )
 
 
+@bp.route("/init", methods=(["POST"]))
+def init():
+    if not request.is_json:
+        return "Request no contiene un Json", 400
+
+    json = request.json
+    if "node" not in json:
+        return "json no contiene 'nodo'", 400
+
+    if Node.objects(node=json["node"]).count() == 0:
+        return "No se encontraron nodos", 404
+
+    return Node.objects(node=json["node"]).first()
+
+
 @bp.route("/", methods=(["GET"]))
 def get_nodes():
     logging.info("GET nodos/ request")
@@ -21,7 +36,7 @@ def get_node_by_id(id):
     logging.info("GET nodos/{} request".format(id))
     node = Node.objects(node=id).first()
     if not node:
-        return jsonify({"error": "nodo no encontrado"})
+        return jsonify({"error": "nodo no encontrado"}), 404
     else:
         return jsonify(node.to_json())
 
