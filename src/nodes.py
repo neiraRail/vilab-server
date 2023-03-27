@@ -9,6 +9,21 @@ bp = Blueprint(
 )
 
 
+@bp.route("/init", methods=(["POST"]))
+def init():
+    if not request.is_json:
+        return "Request no contiene un Json", 400
+
+    json = request.json
+    if "node" not in json:
+        return "json no contiene 'node'", 400
+
+    if Node.objects(node=json["node"]).count() == 0:
+        return "No se encontraron nodos", 404
+
+    return jsonify(Node.objects(node=json["node"]).first().to_json())
+
+
 @bp.route("/", methods=(["GET"]))
 def get_nodes():
     logging.info("GET nodos/ request")
@@ -21,7 +36,7 @@ def get_node_by_id(id):
     logging.info("GET nodos/{} request".format(id))
     node = Node.objects(node=id).first()
     if not node:
-        return jsonify({"error": "nodo no encontrado"})
+        return jsonify({"error": "nodo no encontrado"}), 404
     else:
         return jsonify(node.to_json())
 
@@ -49,18 +64,21 @@ def validar_nodo(nodo):
             "ssid",
             "password",
             "serverREST",
+            "serverREST2",
             "node",
+            "time_reset",
             "time_event",
             "delay_sensor",
-            "time_reset",
+            "batch_size",
             "token",
+            "detail",
         ]
     )
     if set(nodo.keys()) != keys:
         diferencia = [x for x in keys if x not in nodo.keys()]
         return {
             "valido": False,
-            "razon": "Al vector le faltan los atributos: " + str(diferencia),
+            "razon": "Al nodo le faltan los atributos: " + str(diferencia),
         }
     if not all(
         [type(value) is str or type(value) is int for key, value in nodo.items()]
