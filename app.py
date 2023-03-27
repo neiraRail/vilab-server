@@ -7,6 +7,8 @@ import os
 
 from src.models.node import Node
 
+from src.models.node import Node
+
 from src.database import db as mongo
 from src.events import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
@@ -77,12 +79,16 @@ def create_event():
     return "Ingresados {} registros".format(len(event["data"]))
 
 
+batches = 0
+
+
 @app.route("/file3", methods=(["POST"]))
 def file3():
-    logging.info("POST file3/ request")
-    logging.info(request.headers)
+    global batches
+    # logging.info("POST file3/ request")
     logging.info(request.json)
-    logging.info(request.content_length)
+    batches += 1
+    logging.info("batch nro: {}".format(batches))
     return "OK"
 
 
