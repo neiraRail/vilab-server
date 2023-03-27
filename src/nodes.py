@@ -16,12 +16,12 @@ def init():
 
     json = request.json
     if "node" not in json:
-        return "json no contiene 'nodo'", 400
+        return "json no contiene 'node'", 400
 
     if Node.objects(node=json["node"]).count() == 0:
         return "No se encontraron nodos", 404
 
-    return Node.objects(node=json["node"]).first()
+    return jsonify(Node.objects(node=json["node"]).first().to_json())
 
 
 @bp.route("/", methods=(["GET"]))
@@ -64,18 +64,21 @@ def validar_nodo(nodo):
             "ssid",
             "password",
             "serverREST",
+            "serverREST2",
             "node",
+            "time_reset",
             "time_event",
             "delay_sensor",
-            "time_reset",
+            "batch_size",
             "token",
+            "detail",
         ]
     )
     if set(nodo.keys()) != keys:
         diferencia = [x for x in keys if x not in nodo.keys()]
         return {
             "valido": False,
-            "razon": "Al vector le faltan los atributos: " + str(diferencia),
+            "razon": "Al nodo le faltan los atributos: " + str(diferencia),
         }
     if not all(
         [type(value) is str or type(value) is int for key, value in nodo.items()]
