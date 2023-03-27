@@ -67,6 +67,15 @@ def create_event():
     return "Ingresados {} registros".format(len(event["data"]))
 
 
+@app.route("/file3", methods=(["POST"]))
+def file3():
+    logging.info("POST file3/ request")
+    logging.info(request.headers)
+    logging.info(request.json)
+    logging.info(request.content_length)
+    return "OK"
+
+
 @app.route("/files", methods=(["POST"]))
 def save_file():
     logging.info("POST files/ request")
