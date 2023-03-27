@@ -34,6 +34,7 @@ def get_event(event):
     else:
         return jsonify(evento.to_json())
 
+
 @bp.route("", methods=(["POST"]))
 def create_event_jota():
     logging.info("POST events/ request")
@@ -41,9 +42,10 @@ def create_event_jota():
     json["time"] = time.mktime(datetime.now().timetuple())
     resultado = validar_vector(json)
     if not resultado["valido"]:
-       return resultado, 400
+        return resultado, 400
     event = Event(**json)
     event.save()
+    logging.info(json)
     return jsonify(event.to_json())
 
 
