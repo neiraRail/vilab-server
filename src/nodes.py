@@ -17,11 +17,19 @@ def init():
     json = request.json
     if "node" not in json:
         return "json no contiene 'node'", 400
+    if "start" not in json:
+        return "json no contiene 'start'", 400
 
     if Node.objects(node=json["node"]).count() == 0:
         return "No se encontraron nodos", 404
 
-    return jsonify(Node.objects(node=json["node"]).first().to_json())
+    # Actualiza base de datos
+    id_del_nodo = Node.objects(node=json["node"]).first().id
+    Node.objects(id=id_del_nodo).update(set__start=json["start"])
+
+    newconf = Node.objects(node=json["node"]).first().to_json()
+
+    return jsonify(newconf)
 
 
 @bp.route("/", methods=(["GET"]))
