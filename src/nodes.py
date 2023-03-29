@@ -72,10 +72,11 @@ def validar_nodo(nodo):
             "batch_size",
             "token",
             "detail",
+            "start",
         ]
     )
-    if set(nodo.keys()) != keys:
-        diferencia = [x for x in keys if x not in nodo.keys()]
+    diferencia = [x for x in keys if x not in nodo.keys()]
+    if len(diferencia) != 0:
         return {
             "valido": False,
             "razon": "Al nodo le faltan los atributos: " + str(diferencia),

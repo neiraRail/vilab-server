@@ -11,8 +11,9 @@ def test_nodo_correcto():
         "time_event": 2500,
         "delay_sensor": 200,
         "time_reset": 24,
-        "batch_size": 1,
-        "token": "108160136",
+        "batch_size": 10,
+        "start": 0,
         "detail": "",
+        "token": "108160136",
     }
     assert validar_nodo(nodo) == {"valido": True, "razon": None}
