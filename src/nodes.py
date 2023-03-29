@@ -72,6 +72,7 @@ def validar_nodo(nodo):
             "batch_size",
             "token",
             "detail",
+            "start",
         ]
     )
     if set(nodo.keys()) != keys:

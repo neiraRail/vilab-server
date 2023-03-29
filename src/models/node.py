@@ -13,6 +13,7 @@ class Node(db.Document):
     batch_size = db.IntField()
     token = db.StringField()
     detail = db.StringField()
+    start = db.IntField()
 
     def to_json(self):
         return {
@@ -27,4 +28,5 @@ class Node(db.Document):
             "batch_size": self.batch_size,
             "token": self.token,
             "detail": self.detail,
+            "start": self.start,
         }
