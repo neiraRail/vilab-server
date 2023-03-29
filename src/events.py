@@ -80,8 +80,8 @@ def validar_vector(vector):
             "temp",
         ]
     )
-    if set(vector.keys()) != keys:
-        diferencia = [x for x in keys if x not in vector.keys()]
+    diferencia = [x for x in keys if x not in vector.keys()]
+    if len(diferencia) != 0:
         return {
             "valido": False,
             "razon": "Al vector le faltan los atributos: " + str(diferencia),
