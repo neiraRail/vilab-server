@@ -16,6 +16,7 @@ class Event(db.Document):
     mag_y = db.FloatField()
     mag_z = db.FloatField()
     temp = db.FloatField()
+    start = db.IntField()
 
     def to_json(self):
         return {
@@ -33,4 +34,5 @@ class Event(db.Document):
             "mag_y": self.mag_y,
             "mag_z": self.mag_z,
             "temp": self.temp,
+            "start": self.start,
         }
