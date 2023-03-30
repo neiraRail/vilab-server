@@ -14,6 +14,7 @@ class Node(db.Document):
     token = db.StringField()
     detail = db.StringField()
     start = db.IntField()
+    active = db.IntField()
 
     def to_json(self):
         return {
@@ -29,4 +30,5 @@ class Node(db.Document):
             "token": self.token,
             "detail": self.detail,
             "start": self.start,
+            "active": self.active,
         }
