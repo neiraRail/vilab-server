@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import logging
@@ -22,6 +23,7 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
+CORS(app)
 app.config["MONGODB_SETTINGS"] = {
     "db": "vibration_db",
     "host": "localhost",
