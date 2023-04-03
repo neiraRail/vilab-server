@@ -62,6 +62,35 @@ def crear_nodo():
     return jsonify(nodo.to_json())
 
 
+@bp.route("/<id>", methods=(["PUT"]))
+def editar_nodo(id: int):
+    logging.info("PUT nodos/{} request".format(id))
+    json = request.json
+    validacion = validar_nodo(json)
+    if not validacion["valido"]:
+        return validacion, 400
+
+    nodo = Node.objects(node=id).first()
+    if not nodo:
+        return jsonify({"error": "nodo no encontrado"}), 404
+
+    nodo.update(**json)
+    nodo.reload()
+    return jsonify(nodo.to_json())
+
+
+@bp.route("/<id>", methods=(["DELETE"]))
+def delete_nodo(id):
+    logging.info("DELETE nodos/{} request".format(id))
+
+    nodo = Node.objects(node=id).first()
+    if not nodo:
+        return jsonify({"error": "nodo no encontrado"}), 404
+
+    nodo.delete()
+    return jsonify({"message": "nodo eliminado correctamente"})
+
+
 def validar_nodo(nodo):
     if type(nodo) is not dict:
         return {"valido": False, "razon": "El nodo no es un diccionario"}
