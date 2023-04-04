@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime
 import time
 import logging
+import requests
 
 from src.models.event import Event
 
@@ -46,6 +47,12 @@ def create_event_jota():
     event = Event(**json)
     event.save()
     logging.info(json)
+
+    # Reenviar a servidor Monitoreo
+    url = "http://54.227.23.159:8082/events"
+    respuesta = requests.post(url, json=json)
+    logging.info(respuesta)
+
     return jsonify(event.to_json())
 
 
