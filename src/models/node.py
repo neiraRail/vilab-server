@@ -2,19 +2,19 @@ from src.database import db
 
 
 class Node(db.Document):
-    node = db.IntField()
-    ssid = db.StringField()
-    password = db.StringField()
-    serverREST = db.StringField()
-    serverREST2 = db.StringField()
-    time_reset = db.IntField()
+    node = db.IntField(required=True, unique=True)
+    ssid = db.StringField(required=True)
+    password = db.StringField(required=True)
+    serverREST = db.StringField(required=True)
+    serverREST2 = db.StringField(required=True)
+    time_reset = db.IntField(default=24)
     time_event = db.IntField()
-    delay_sensor = db.IntField()
+    delay_sensor = db.IntField(default=100)
     batch_size = db.IntField()
     token = db.StringField()
-    detail = db.StringField()
-    start = db.IntField()
-    active = db.IntField()
+    detail = db.StringField(required=True)
+    start = db.IntField(default=0)
+    active = db.IntField(default=0)
 
     def to_json(self):
         return {

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from src.models.node import Node
 import logging
+from mongoengine.errors import NotUniqueError, ValidationError, FieldDoesNotExist
 
 
 bp = Blueprint(
@@ -35,7 +36,7 @@ def init():
 @bp.route("/", methods=(["GET"]))
 def get_nodes():
     logging.info("GET nodos/ request")
-    nodos = Node.objects()
+    nodos = Node.objects().exclude("id")
     return jsonify(nodos)
 
 
@@ -57,8 +58,17 @@ def crear_nodo():
     if not validacion["valido"]:
         return validacion, 400
 
-    nodo = Node(**json)
-    nodo.save()
+    try:
+        nodo = Node(**json)
+        nodo.validate()
+        nodo.save()
+    except FieldDoesNotExist as e:
+        return jsonify({"valido": "false", "razon": str(e)}), 400
+    except ValidationError as e:
+        return jsonify({"valido": "false", "razon": e.to_dict()}), 400
+    except NotUniqueError as e:
+        return jsonify({"valido": "false", "razon": str(e)}), 400
+
     return jsonify(nodo.to_json())
 
 
@@ -66,14 +76,14 @@ def crear_nodo():
 def editar_nodo(id: int):
     logging.info("PUT nodos/{} request".format(id))
     json = request.json
-    validacion = validar_nodo(json)
-    if not validacion["valido"]:
-        return validacion, 400
+    # validacion = validar_nodo(json)
+    # if not validacion["valido"]:
+    # return validacion, 400
 
     nodo = Node.objects(node=id).first()
     if not nodo:
         return jsonify({"error": "nodo no encontrado"}), 404
-
+    logging.info(json)
     nodo.update(**json)
     nodo.reload()
     return jsonify(nodo.to_json())
