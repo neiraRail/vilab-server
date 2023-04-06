@@ -49,9 +49,9 @@ def create_event_jota():
     logging.info(json)
 
     # Reenviar a servidor Monitoreo
-    url = "http://54.227.23.159:8082/events"
-    respuesta = requests.post(url, json=json)
-    logging.info(respuesta)
+    # url = "http://54.227.23.159:8082/events"
+    # respuesta = requests.post(url, json=json)
+    # logging.info(respuesta)
 
     return jsonify(event.to_json())
 
