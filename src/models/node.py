@@ -1,7 +1,7 @@
 from src.database import db
 
 
-class Node(db.Document):
+class Node(db.DynamicDocument):
     node = db.IntField(required=True, unique=True)
     ssid = db.StringField(required=True)
     password = db.StringField(required=True)
