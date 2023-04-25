@@ -10,6 +10,8 @@ from src.database import db as mongo
 from src.events import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
 
+from src.models.event import Event
+
 APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, "files")
 
@@ -78,6 +80,11 @@ def file3():
     logging.info(request.json)
     batches += 1
     logging.info("batch nro: {}".format(batches))
+    data = request.json
+    for event in data["data"]:
+        event["time"] = time.mktime(datetime.now().timetuple())
+        eventDB = Event(**event)
+        eventDB.save()
     return "OK"
 
 

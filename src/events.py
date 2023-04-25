@@ -69,24 +69,25 @@ def validar_vector(vector):
         return {"valido": False, "razon": "El vector no es un diccionario"}
     if not vector:
         return {"valido": False, "razon": "El vector es nulo"}
-    keys = set(
-        [
-            "time_lap",
-            "time",
-            "node",
-            "event",
-            "acc_x",
-            "acc_y",
-            "acc_z",
-            "gyr_x",
-            "gyr_y",
-            "gyr_z",
-            "mag_x",
-            "mag_y",
-            "mag_z",
-            "temp",
-        ]
-    )
+    # keys = set(
+    #     [
+    #         "time_lap",
+    #         "time",
+    #         "node",
+    #         "event",
+    #         "acc_x",
+    #         "acc_y",
+    #         "acc_z",
+    #         "gyr_x",
+    #         "gyr_y",
+    #         "gyr_z",
+    #         "mag_x",
+    #         "mag_y",
+    #         "mag_z",
+    #         "temp",
+    #     ]
+    # )
+    keys = set(["node", "event"])
     diferencia = [x for x in keys if x not in vector.keys()]
     if len(diferencia) != 0:
         return {
