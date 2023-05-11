@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime
 import time
 import logging
-import requests
 
 from src.models.event import Event
 
@@ -26,14 +25,32 @@ def get_events():
     return jsonify(eventos)
 
 
-@bp.route("/<event>", methods=(["GET"]))
-def get_event(event):
-    logging.info("GET events/{} request".format(event))
-    evento = Event.objects(event=event).first()
-    if not evento:
-        return jsonify({"error": "evento no encontrado"})
+@bp.route("/node/<node>", methods=(["GET"]))
+def get_all_by_node(node):
+    logging.info("GET events/node/{} request".format(node))
+    pipeline = [
+        {"$match": {"node": int(node)}},
+        {"$sort": {"time": 1}},
+        {"$group": {"_id": "$event", "time": {"$first": "$time"}}},
+        {"$project": {"_id": 0, "event": "$_id", "time": 1}},
+    ]
+
+    eventos = list(Event.objects.aggregate(pipeline))
+    eventos = [e for e in eventos if e["event"] is not None]
+    if not eventos:
+        return jsonify({"error": "nodo no encontrado"}), 404
     else:
-        return jsonify(evento.to_json())
+        return jsonify(eventos)
+
+
+@bp.route("/node/<node>/event/<event>", methods=(["GET"]))
+def get_all_by_event(node, event):
+    logging.info("GET events/node/{}/event/{}".format(node, event))
+    eventos = Event.objects(node=node, event=event).order_by("time")
+    if not eventos:
+        return jsonify({"error": "evento no encontrado"}), 404
+    else:
+        return jsonify(eventos)
 
 
 @bp.route("", methods=(["POST"]))
