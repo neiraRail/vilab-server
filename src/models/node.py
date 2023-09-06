@@ -17,18 +17,11 @@ class Node(db.DynamicDocument):
     active = db.IntField(default=0)
 
     def to_json(self):
-        return {
-            "node": self.node,
-            "ssid": self.ssid,
-            "password": self.password,
-            "serverREST": self.serverREST,
-            "serverREST2": self.serverREST2,
-            "time_reset": self.time_reset,
-            "time_event": self.time_event,
-            "delay_sensor": self.delay_sensor,
-            "batch_size": self.batch_size,
-            "token": self.token,
-            "detail": self.detail,
-            "start": self.start,
-            "active": self.active,
-        }
+        data = {}
+        for field_name in self._fields:
+            # Use getattr to retrieve the value of the field
+            field_value = getattr(self, field_name, None)
+            data[field_name] = field_value
+        return data
+    
+    
