@@ -22,6 +22,5 @@ class Node(db.DynamicDocument):
             # Use getattr to retrieve the value of the field
             field_value = getattr(self, field_name, None)
             data[field_name] = field_value
+        print(data)
         return data
-    
-    
