@@ -17,10 +17,13 @@ class Node(db.DynamicDocument):
     active = db.IntField(default=0)
 
     def to_json(self):
-        data = {}
-        for field_name in self._fields:
-            # Use getattr to retrieve the value of the field
-            field_value = getattr(self, field_name, None)
-            data[field_name] = field_value
-        print(data)
-        return data
+        # Initialize an empty dictionary to store the JSON representation
+        json_data = {}
+
+        # Iterate through all the fields in the document
+        for field_name, field_value in self._data.items():
+            # Check if the field is not None (empty) before adding it to the JSON
+            if field_name != "id" and field_value is not None:
+                json_data[field_name] = field_value
+
+        return json_data
