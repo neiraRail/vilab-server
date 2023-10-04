@@ -6,7 +6,7 @@ from src.lecturas import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
 
 logging.basicConfig(
-    #filename="logs/vilab_server.log",
+    filename="logs/vilab_server.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
