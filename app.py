@@ -1,21 +1,16 @@
 import logging
-import time
-import os
 from flask import Flask
 from flask_cors import CORS
 from src.database import db as mongo
-from src.events import bp as events_blueprint
+from src.lecturas import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
 
 logging.basicConfig(
-    filename="logs/vilab_server.log",
+    #filename="logs/vilab_server.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
 )
-
-APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UPLOAD_FOLDER = os.path.join(APP_ROOT, "files")
 
 # Crear app con CORS y configuración de base de datos.
 app = Flask(__name__)
@@ -27,7 +22,7 @@ app.config["MONGODB_SETTINGS"] = {
 }
 
 # Registrar los endpoints
-app.register_blueprint(events_blueprint, url_prefix="/events")
+app.register_blueprint(events_blueprint, url_prefix="/lectura")
 app.register_blueprint(nodes_blueprint, url_prefix="/nodes")
 
 # Iniciar la conexión con la base de datos.

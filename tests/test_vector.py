@@ -1,4 +1,4 @@
-from src.events import validar_vector
+from src.lecturas import validar_vector
 
 
 def test_vector_correcto():
@@ -6,7 +6,6 @@ def test_vector_correcto():
         "time_lap": 665903,
         "time": 10000000,
         "node": 1,
-        "event": 4,
         "acc_x": -0.39,
         "acc_y": 1.89,
         "acc_z": -10.41,
