@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 app.config["MONGODB_SETTINGS"] = {
     "db": "vibration_db",
-    "host": "172.17.0.1",
+    "host": "mongodb://mongodb",
     "port": 27017,
 }
 
