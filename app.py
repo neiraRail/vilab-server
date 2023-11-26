@@ -1,9 +1,14 @@
+import socket, threading
 import logging
 from flask import Flask
 from flask_cors import CORS
 from src.database import db as mongo
 from src.lecturas import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
+
+import paho.mqtt.client as mqtt
+from src.lecturas import recieve_lectura_socket
+from src.lecturas import recieve_lectura_mqtt
 
 logging.basicConfig(
     filename="logs/vilab_server.log",
@@ -35,7 +40,55 @@ def status():
     return {"estado": "1", "texto": "OK"}
 
 
+def udp_server():
+    print("udp server")
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 8080
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        print("object sock created")
+        sock.bind((UDP_IP, UDP_PORT))
+        print(f"UDP server listening on {UDP_IP}:{UDP_PORT}")
+        recieve_lectura_socket(sock)
+
+def tcp_server():
+    print("tcp server")
+    TCP_IP = "127.0.0.1"
+    TCP_PORT = 8081
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind((TCP_IP, TCP_PORT))
+        print(f"UDP server listening on {TCP_IP}:{TCP_PORT}")
+        recieve_lectura_socket(sock)
+
+
+def mqtt_server():
+    print("mqtt server")
+    client = mqtt.client()
+    def on_connect(client, userdata, flags, rc):
+        client.subscribe("lab/#")
+    
+    def on_message(client, userdata, msg):
+        recieve_lectura_mqtt(client, userdata, msg)
+
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.connect("localhost", 1883, 60)
+    client.loop_forever()
+
+
 if __name__ == "__main__":
     logging.info("Servidor funcionando")
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    udp_thread = threading.Thread(target=udp_server)
+    udp_thread.daemon = True
+    udp_thread.start()
+
+    tcp_thread = threading.Thread(target=tcp_server)
+    tcp_thread.daemon = True
+    tcp_thread.start()
+
+    mqtt_thread = threading.Thread(target=mqtt_server)
+    mqtt_thread.daemon = True
+    mqtt_thread.start()
+
+    app.run(host="0.0.0.0", port=8080, debug=False)
     logging.info("Servidor finalizado")
