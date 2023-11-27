@@ -5,6 +5,7 @@ import time
 import logging
 
 from src.models.lectura import Lectura
+from src.procesado import baseProceso
 
 bp = Blueprint(
     "lectura",
@@ -22,6 +23,8 @@ def recieve_lectura_http():
     event.save()
     # logging.info(json)
     logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+
+    baseProceso.procesar_segun_config(event)
     return jsonify(event.to_json())
 
 
@@ -41,6 +44,10 @@ def recieve_lectura_socket(sock):
         print(lectura.to_json())
         lectura.save()
         logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+
+        
+        baseProceso.procesar_segun_config(json_data)
+
         print(f"Saved data from {addr}")
 
 def recieve_lectura_mqtt(client, userdata, msg):
@@ -55,6 +62,8 @@ def recieve_lectura_mqtt(client, userdata, msg):
     lectura.save()
     logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
 
+    
+    baseProceso.procesar_segun_config(json_data)
 
 @bp.route("", methods=(["GET"]))
 def get_events():
