@@ -22,9 +22,8 @@ def recieve_lectura_http():
     event = Lectura(**json_data)
     event.save()
     # logging.info(json)
-    logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
-
     baseProceso.procesar_segun_config(event)
+    logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
     return jsonify(event.to_json())
 
 
@@ -43,11 +42,10 @@ def recieve_lectura_socket(sock):
         lectura = Lectura(**json_data)
         print(lectura.to_json())
         lectura.save()
-        logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
-
         
         baseProceso.procesar_segun_config(json_data)
 
+        logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
         print(f"Saved data from {addr}")
 
 def recieve_lectura_mqtt(client, userdata, msg):
@@ -60,10 +58,9 @@ def recieve_lectura_mqtt(client, userdata, msg):
     lectura = Lectura(**json_data)
     print(lectura.to_json())
     lectura.save()
-    logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
 
-    
     baseProceso.procesar_segun_config(json_data)
+    logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
 
 @bp.route("", methods=(["GET"]))
 def get_events():
