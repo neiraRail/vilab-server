@@ -15,6 +15,7 @@ class Node(db.DynamicDocument):
     detail = db.StringField(required=True)
     start = db.IntField(default=0)
     active = db.IntField(default=0)
+    protocol = db.StringField(default="http")
 
     def to_json(self):
         # Initialize an empty dictionary to store the JSON representation

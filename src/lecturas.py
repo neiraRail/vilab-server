@@ -1,9 +1,11 @@
+import json
 from flask import Blueprint, jsonify, request
 from datetime import datetime
 import time
 import logging
 
 from src.models.lectura import Lectura
+from src.procesado import baseProceso
 
 bp = Blueprint(
     "lectura",
@@ -11,24 +13,83 @@ bp = Blueprint(
 )
 
 @bp.route("", methods=(["POST"]))
-def create_event_jota():
+def recieve_lectura_http():
+    json_data = request.json
     reloj = time.perf_counter_ns()
-    json = request.json
-    resultado = validar_vector(json)
+    resultado = validar_vector(json_data)
     if not resultado["valido"]:
         return resultado, 400
-    event = Lectura(**json)
+    event = Lectura(**json_data)
     event.save()
     # logging.info(json)
+    # baseProceso.procesar_segun_config(event)
     logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
     return jsonify(event.to_json())
 
+
+def recieve_lectura_udp(sock):
+    while True:
+        data, addr = sock.recvfrom(1024)
+        reloj = time.perf_counter_ns()
+
+        # Convert bytes to JSON
+        json_data = json.loads(data.decode())
+        resultado = validar_vector(json_data)
+        if not resultado["valido"]:
+            logging.info(resultado)
+            continue
+        # Serialize using mongoengine and save to MongoDB
+        lectura = Lectura(**json_data)
+        print(lectura.to_json())
+        lectura.save()
+        
+        # baseProceso.procesar_segun_config(json_data)
+
+        logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+        print(f"Saved data from {addr}")
+
+# def recieve_lectura_tcp(conn, addr):
+#     while True:
+#         reloj = time.perf_counter_ns()
+#         data = conn.recv(1024)
+
+#         if not data:
+#             break
+
+#         # Convert bytes to JSON
+#         json_data = json.loads(data.decode())
+#         resultado = validar_vector(json_data)
+#         if not resultado["valido"]:
+#             logging.info(resultado)
+#             continue
+#         # Serialize using mongoengine and save to MongoDB
+#         lectura = Lectura(**json_data)
+#         print(lectura.to_json())
+#         lectura.save()
+        
+#         baseProceso.procesar_segun_config(json_data)
+
+#         logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+#         print(f"Saved data from {addr}")
+
+# def recieve_lectura_mqtt(client, userdata, msg):
+#     reloj = time.perf_counter_ns()
+#     json_data = json.loads(msg)
+#     resultado = validar_vector(json_data)
+#     if not resultado["valido"]:
+#         logging.info(resultado)
+#         return
+#     lectura = Lectura(**json_data)
+#     print(lectura.to_json())
+#     lectura.save()
+
+#     baseProceso.procesar_segun_config(json_data)
+#     logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
 
 @bp.route("", methods=(["GET"]))
 def get_events():
     eventos = Lectura.objects()
     return jsonify(eventos)
-
 
 
 @bp.route("/node/<node>", methods=(["GET"]))
@@ -56,7 +117,6 @@ def get_all_by_event(node, event):
         return jsonify({"error": "evento no encontrado"}), 404
     else:
         return jsonify(eventos)
-
 
 
 @bp.route("/<id>", methods=(["DELETE"]))
