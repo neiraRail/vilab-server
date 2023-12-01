@@ -46,6 +46,7 @@ def udp_server():
     UDP_IP = "0.0.0.0"
     UDP_PORT = 8080
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.settimeout(None)
         logging.info("object sock created")
         sock.bind((UDP_IP, UDP_PORT))
         logging.info(f"UDP server listening on {UDP_IP}:{UDP_PORT}")
