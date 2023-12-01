@@ -86,6 +86,10 @@ if __name__ == "app":
     udp_thread.daemon = True
     udp_thread.start()
 
+    mqtt_thread = threading.Thread(target=mqtt_server)
+    mqtt_thread.daemon = True
+    mqtt_thread.start()
+
 if __name__ == "__main__":
     logging.info("Servidor funcionando")
     udp_thread = threading.Thread(target=udp_server)
