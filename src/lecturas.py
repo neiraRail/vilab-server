@@ -23,7 +23,8 @@ def recieve_lectura_http():
     event.save()
     # logging.info(json)
     # baseProceso.procesar_segun_config(event)
-    logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+    logging.info("time_lap: {}".format(json_data["time_lap"]))
+    # logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
     return jsonify(event.to_json())
 
 
