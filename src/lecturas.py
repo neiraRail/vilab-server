@@ -44,8 +44,8 @@ def recieve_lectura_udp(sock):
         lectura.save()
         
         # baseProceso.procesar_segun_config(json_data)
-
-        logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+        logging.info("time_lap: {}".format(json_data["time_lap"]))
+        # logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
         print(f"Saved data from {addr}")
 
 # def recieve_lectura_tcp(conn, addr):
