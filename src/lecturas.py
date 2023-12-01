@@ -73,19 +73,20 @@ def recieve_lectura_udp(sock):
 #         logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
 #         print(f"Saved data from {addr}")
 
-# def recieve_lectura_mqtt(client, userdata, msg):
-#     reloj = time.perf_counter_ns()
-#     json_data = json.loads(msg)
-#     resultado = validar_vector(json_data)
-#     if not resultado["valido"]:
-#         logging.info(resultado)
-#         return
-#     lectura = Lectura(**json_data)
-#     print(lectura.to_json())
-#     lectura.save()
+def recieve_lectura_mqtt(client, userdata, msg):
+    reloj = time.perf_counter_ns()
+    json_data = json.loads(msg.payload.decode())
+    resultado = validar_vector(json_data)
+    if not resultado["valido"]:
+        logging.info(resultado)
+        return
+    
+    lectura = Lectura(**json_data)
+    lectura.save()
 
-#     baseProceso.procesar_segun_config(json_data)
-#     logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
+    # baseProceso.procesar_segun_config(json_data)
+    logging.info("time_lap: {}".format(json_data["time_lap"]))
+    # logging.info( "Tiempo de ejecución: {}".format( time.perf_counter_ns()-reloj))
 
 @bp.route("", methods=(["GET"]))
 def get_events():

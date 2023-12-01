@@ -9,7 +9,7 @@ from src.nodes import bp as nodes_blueprint
 import paho.mqtt.client as mqtt
 from src.lecturas import recieve_lectura_udp
 # from src.lecturas import recieve_lectura_tcp
-# from src.lecturas import recieve_lectura_mqtt
+from src.lecturas import recieve_lectura_mqtt
 
 logging.basicConfig(
     filename="logs/vilab_server.log",
@@ -64,20 +64,20 @@ def udp_server():
 #             recieve_lectura_tcp(conn, addr)
 
 
-# def mqtt_server():
-#     print("mqtt server")
-#     client = mqtt.client()
-#     def on_connect(client, userdata, flags, rc):
-#         client.subscribe("lab/#")
+def mqtt_server():
+    print("mqtt server")
+    client = mqtt.Client()
+    def on_connect(client, userdata, flags, rc):
+        client.subscribe("lab/#")
     
-#     def on_message(client, userdata, msg):
-#         recieve_lectura_mqtt(client, userdata, msg)
+    def on_message(client, userdata, msg):
+        recieve_lectura_mqtt(client, userdata, msg)
 
-#     client.on_connect = on_connect
-#     client.on_message = on_message
+    client.on_connect = on_connect
+    client.on_message = on_message
 
-#     client.connect("localhost", 1883, 60)
-#     client.loop_forever()
+    client.connect("200.13.4.208", 1883, 60)
+    client.loop_forever()
 
 
 if __name__ == "__main__":
@@ -90,9 +90,9 @@ if __name__ == "__main__":
     # tcp_thread.daemon = True
     # tcp_thread.start()
 
-    # mqtt_thread = threading.Thread(target=mqtt_server)
-    # mqtt_thread.daemon = True
-    # mqtt_thread.start()
+    mqtt_thread = threading.Thread(target=mqtt_server)
+    mqtt_thread.daemon = True
+    mqtt_thread.start()
 
     app.run(host="0.0.0.0", port=8080, debug=False)
     logging.info("Servidor finalizado")
