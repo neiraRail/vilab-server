@@ -6,7 +6,7 @@ from src.database import db as mongo
 from src.lecturas import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
 
-# import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 from src.lecturas import recieve_lectura_udp
 # from src.lecturas import recieve_lectura_tcp
 from src.lecturas import recieve_lectura_mqtt
