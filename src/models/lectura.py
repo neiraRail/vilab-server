@@ -2,12 +2,12 @@ from src.database import db
 
 
 class Lectura(db.DynamicDocument):
-    time_lap = db.LongField()
-    time = db.LongField()
+    delta = db.IntField(required=True)
+    time = db.LongField(required=True)
     node = db.IntField(required=True)
-    acc_x = db.FloatField()
-    acc_y = db.FloatField()
-    acc_z = db.FloatField()
+    acc_x = db.FloatField(required=True)
+    acc_y = db.FloatField(required=True)
+    acc_z = db.FloatField(required=True)
     gyr_x = db.FloatField()
     gyr_y = db.FloatField()
     gyr_z = db.FloatField()
