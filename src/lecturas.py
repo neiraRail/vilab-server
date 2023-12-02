@@ -54,11 +54,11 @@ def recieve_lectura_udp(sock):
             event.validate()
             event.save()
         except FieldDoesNotExist as e:
-            return jsonify({"valido": "false", "razon": str(e)}), 400
+            logging.info(str(e))
         except ValidationError as e:
-            return jsonify({"valido": "false", "razon": e.to_dict()}), 400
+            logging.info(str(e))
         except NotUniqueError as e:
-            return jsonify({"valido": "false", "razon": str(e)}), 400
+            logging.info(str(e))
         
         # baseProceso.procesar_segun_config(json_data)
         logging.info("delta: {}".format(json_data["delta"]))
@@ -102,11 +102,11 @@ def recieve_lectura_mqtt(client, userdata, msg):
         event.validate()
         event.save()
     except FieldDoesNotExist as e:
-        return jsonify({"valido": "false", "razon": str(e)}), 400
+        logging.info(str(e))
     except ValidationError as e:
-        return jsonify({"valido": "false", "razon": e.to_dict()}), 400
+        logging.info(str(e))
     except NotUniqueError as e:
-        return jsonify({"valido": "false", "razon": str(e)}), 400
+        logging.info(str(e))
 
     # baseProceso.procesar_segun_config(json_data)
     logging.info("delta: {}".format(json_data["delta"]))
