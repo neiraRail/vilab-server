@@ -54,10 +54,9 @@ def get_node_by_id(id):
 def crear_nodo():
     logging.info("POST nodos/ request")
     json = request.json
-    validacion = validar_nodo(json)
-    if not validacion["valido"]:
-        return validacion, 400
-
+    # validacion = validar_nodo(json)
+    # if not validacion["valido"]:
+    #     return validacion, 400
     try:
         nodo = Node(**json)
         nodo.validate()
@@ -101,38 +100,38 @@ def delete_nodo(id):
     return jsonify({"message": "nodo eliminado correctamente"})
 
 
-def validar_nodo(nodo):
-    if type(nodo) is not dict:
-        return {"valido": False, "razon": "El nodo no es un diccionario"}
-    if not nodo:
-        return {"valido": False, "razon": "El nodo es nulo"}
-    keys = set(
-        [
-            "ssid",
-            "password",
-            "serverREST",
-            "serverREST2",
-            "node",
-            "time_reset",
-            "time_event",
-            "delay_sensor",
-            "batch_size",
-            "token",
-            "detail",
-            "start",
-        ]
-    )
-    diferencia = [x for x in keys if x not in nodo.keys()]
-    if len(diferencia) != 0:
-        return {
-            "valido": False,
-            "razon": "Al nodo le faltan los atributos: " + str(diferencia),
-        }
-    if not all(
-        [type(value) is str or type(value) is int for key, value in nodo.items()]
-    ):
-        return {
-            "valido": False,
-            "razon": "Alguno de los atributos no son str ni int",
-        }
-    return {"valido": True, "razon": None}
+# def validar_nodo(nodo):
+#     if type(nodo) is not dict:
+#         return {"valido": False, "razon": "El nodo no es un diccionario"}
+#     if not nodo:
+#         return {"valido": False, "razon": "El nodo es nulo"}
+#     keys = set(
+#         [
+#             "ssid",
+#             "password",
+#             "serverREST",
+#             "serverREST2",
+#             "node",
+#             "time_reset",
+#             "time_event",
+#             "delay_sensor",
+#             "batch_size",
+#             "token",
+#             "detail",
+#             "start",
+#         ]
+#     )
+#     diferencia = [x for x in keys if x not in nodo.keys()]
+#     if len(diferencia) != 0:
+#         return {
+#             "valido": False,
+#             "razon": "Al nodo le faltan los atributos: " + str(diferencia),
+#         }
+#     if not all(
+#         [type(value) is str or type(value) is int for key, value in nodo.items()]
+#     ):
+#         return {
+#             "valido": False,
+#             "razon": "Alguno de los atributos no son str ni int",
+#         }
+#     return {"valido": True, "razon": None}

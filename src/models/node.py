@@ -1,21 +1,22 @@
 from src.database import db
+from src.models.operacion import Operacion
 
 
 class Node(db.DynamicDocument):
-    node = db.IntField(required=True, unique=True)
+    active = db.IntField(required=True, default=0)
     ssid = db.StringField(required=True)
     password = db.StringField(required=True)
-    serverREST = db.StringField(required=True)
-    serverREST2 = db.StringField(required=True)
-    time_reset = db.IntField(default=24)
-    time_event = db.IntField()
-    delay_sensor = db.IntField(default=100)
-    batch_size = db.IntField()
-    token = db.StringField()
+    rest_server = db.StringField(required=True)
+    node = db.IntField(required=True, unique=True)
     detail = db.StringField(required=True)
-    start = db.IntField(default=0)
-    active = db.IntField(default=0)
-    protocol = db.StringField(default="http")
+    time_reset = db.IntField(required=True, default=24)
+    time_update = db.IntField(required=True, default=60)
+    time_sensor = db.IntField(required=True, default=100)
+    protocol = db.StringField(required=True, default="http")
+    batch_size = db.IntField()
+    send_mode = db.StringField(required=True, default="stream")
+    operaciones = db.ListField(db.EmbeddedDocumentField(Operacion), required=False)
+    start = db.IntField(required=True, default=0)
 
     def to_json(self):
         # Initialize an empty dictionary to store the JSON representation
