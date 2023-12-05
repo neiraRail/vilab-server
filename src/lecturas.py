@@ -28,10 +28,41 @@ def guardarLectura(json_data):
     logging.info("delta: {}".format(json_data["delta"]))
     return jsonify(event.to_json())
 
+def guardarBatch(json_data):
+    logging.info("Se recibió un batch")
+    logging.info("batch_id: {}".format(json_data["id"]))
+    logging.info("len: {}".format(json_data["len"]))
+    try:
+        for data in json_data["batch"]:
+            event = Lectura(**data)
+            event.validate()
+            event.save()
+        
+        # Procesar batch
+        # identifier = {
+        #     "node": json_data.batch[0].node,
+        #     "start": json_data.batch[0].start,
+        #     "batch_id": json_data.id,
+        #     "len": json_data.len
+        # }
+        # baseProceso(identifier)
+    except FieldDoesNotExist as e:
+        return jsonify({"valido": "false", "razon": str(e)}), 400
+    except ValidationError as e:
+        return jsonify({"valido": "false", "razon": e.to_dict()}), 400
+    except NotUniqueError as e:
+        return jsonify({"valido": "false", "razon": str(e)}), 400
+    
+    # logging.info("delta: {}".format(json_data["delta"]))
+    return jsonify(event.to_json())
+
 @bp.route("", methods=(["POST"]))
 def recieve_lectura_http():
     json_data = request.json
-    return guardarLectura(json_data)
+    if "batch" in json_data:
+        return guardarBatch(json_data)
+    else:
+        return guardarLectura(json_data)
 
 
 def recieve_lectura_udp(sock):
@@ -41,14 +72,19 @@ def recieve_lectura_udp(sock):
 
         # Convert bytes to JSON
         json_data = json.loads(data.decode())
-        guardarLectura(json_data)
+        if "batch" in json_data:
+            guardarBatch(json_data)
+        else:
+            guardarLectura(json_data)
 
 
 def recieve_lectura_mqtt(client, userdata, msg):
     # reloj = time.perf_counter_ns()
     json_data = json.loads(msg.payload.decode())
-    
-    guardarLectura(json_data)
+    if "batch" in json_data:
+        guardarBatch(json_data)
+    else:
+        guardarLectura(json_data)
 
 
 @bp.route("", methods=(["GET"]))
