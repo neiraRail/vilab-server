@@ -7,6 +7,7 @@ from mongoengine.errors import NotUniqueError, ValidationError, FieldDoesNotExis
 
 from src.models.lectura import Lectura
 from src.procesado import baseProceso
+from src.executor import executor
 
 bp = Blueprint(
     "lectura",
@@ -30,7 +31,7 @@ def guardarLectura(json_data):
 
 def guardarBatch(json_data):
     logging.info("Se recibió un batch")
-    logging.info("batch_id: {}".format(json_data["id"]))
+    logging.info("batch_id: {}".format(str(json_data["id"])+"/"+str(json_data["batch"][0]["start"])))
     logging.info("len: {}".format(json_data["len"]))
     try:
         for data in json_data["batch"]:
@@ -39,13 +40,13 @@ def guardarBatch(json_data):
             event.save()
         
         # Procesar batch
-        # identifier = {
-        #     "node": json_data.batch[0].node,
-        #     "start": json_data.batch[0].start,
-        #     "batch_id": json_data.id,
-        #     "len": json_data.len
-        # }
-        # baseProceso(identifier)
+        identifier = {
+            "node": json_data["batch"][0]["node"],
+            "start": json_data["batch"][0]["start"],
+            "batch_id": json_data["id"],
+            "batch": json_data["batch"]
+        }
+        executor.submit(baseProceso.procesar_segun_config, identifier)
     except FieldDoesNotExist as e:
         return jsonify({"valido": "false", "razon": str(e)}), 400
     except ValidationError as e:
@@ -53,8 +54,8 @@ def guardarBatch(json_data):
     except NotUniqueError as e:
         return jsonify({"valido": "false", "razon": str(e)}), 400
     
-    # logging.info("delta: {}".format(json_data["delta"]))
-    return jsonify(event.to_json())
+    logging.info("delta: {}".format(json_data["batch"][1]["delta"]))
+    return jsonify(True)
 
 @bp.route("", methods=(["POST"]))
 def recieve_lectura_http():
