@@ -1,6 +1,6 @@
 from src.database import db
 
-class Feature(db.DynamicEmbeddedDocument):
+class Feature(db.DynamicDocument):
     subtipo = db.StringField(required=True)
     node = db.IntField(required=True)
     time = db.LongField(required=True)

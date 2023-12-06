@@ -30,6 +30,7 @@ app.config["MONGODB_SETTINGS"] = {
 }
 app.config['EXECUTOR_TYPE'] = 'thread'
 app.config['EXECUTOR_MAX_WORKERS'] = 100
+app.config['EXECUTOR_PROPAGATE_EXCEPTIONS'] = True
 
 # Registrar los endpoints
 app.register_blueprint(events_blueprint, url_prefix="/lectura")
