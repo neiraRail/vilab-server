@@ -23,6 +23,7 @@ class BaseProceso:
 
 from src.procesado import filtrado
 from src.procesado import extraccion
+from src.models.feature import Feature
 
 subtipo2class = {
     "lowpass": filtrado.lowPassFilter,
@@ -56,5 +57,9 @@ def procesar_segun_config(identifier):
             res["node"] = identifier["node"]
             res["start"] = identifier["start"]
             res["batch_id"] = identifier["batch_id"]
+            res["time"] = batch[0]["time"]
+            res["subtipo"] = operacion.subtipo
             logging.info("{}: {}".format(operacion["subtipo"], res))
             # Guardar res
+            feature = Feature(**res)
+            feature.save()
