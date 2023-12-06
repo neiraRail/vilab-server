@@ -3,6 +3,7 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from src.database import db as mongo
+from src.executor import executor
 from src.lecturas import bp as events_blueprint
 from src.nodes import bp as nodes_blueprint
 
@@ -21,11 +22,14 @@ logging.basicConfig(
 # Crear app con CORS y configuración de base de datos.
 app = Flask(__name__)
 CORS(app)
+
 app.config["MONGODB_SETTINGS"] = {
     "db": "vibration_db",
     "host": "localhost",
     "port": 27017,
 }
+app.config['EXECUTOR_TYPE'] = 'thread'
+app.config['EXECUTOR_MAX_WORKERS'] = 100
 
 # Registrar los endpoints
 app.register_blueprint(events_blueprint, url_prefix="/lectura")
@@ -33,6 +37,7 @@ app.register_blueprint(nodes_blueprint, url_prefix="/nodes")
 
 # Iniciar la conexión con la base de datos.
 mongo.init_app(app)
+executor.init_app(app)
 
 
 @app.route("/status")
