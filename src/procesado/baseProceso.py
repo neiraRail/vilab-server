@@ -48,6 +48,7 @@ def getConfig(node_id):
 def procesar_segun_config(identifier):
     config = getConfig(identifier["node"])
     batch = identifier["batch"]
+    logging.info("Config: {}".format(config))
     for operacion in config:
         if operacion.tipo == "filtrado":
             vector = subtipo2class[operacion.subtipo](batch)
