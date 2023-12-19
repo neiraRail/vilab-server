@@ -20,13 +20,13 @@ def guardarLectura(json_data):
         event.validate()
         event.save()
     except FieldDoesNotExist as e:
-        logging.errir(e)
+        logging.error(e)
         return jsonify({"valido": "false", "razon": str(e)}), 400
     except ValidationError as e:
-        logging.errir(e)
+        logging.error(e)
         return jsonify({"valido": "false", "razon": e.to_dict()}), 400
     except NotUniqueError as e:
-        logging.errir(e)
+        logging.error(e)
         return jsonify({"valido": "false", "razon": str(e)}), 400
     
     logging.info("delta: {}".format(json_data["delta"]))
@@ -51,13 +51,13 @@ def guardarBatch(json_data):
         }
         executor.submit(baseProceso.procesar_segun_config, identifier)
     except FieldDoesNotExist as e:
-        logging.errir(e)
+        logging.error(e)
         return jsonify({"valido": "false", "razon": str(e)}), 400
     except ValidationError as e:
-        logging.errir(e)
+        logging.error(e)
         return jsonify({"valido": "false", "razon": e.to_dict()}), 400
     except NotUniqueError as e:
-        logging.errir(e)
+        logging.error(e)
         return jsonify({"valido": "false", "razon": str(e)}), 400
     
     logging.info("delta: {}".format(json_data["batch"][1]["delta"]))
