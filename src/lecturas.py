@@ -38,10 +38,10 @@ def guardarLectura(json_data, isHttp):
         return jsonify(event.to_json())
 
 def guardarBatch(json_data, isHttp):
-    logging.info("Se recibió un batch")
-    logging.info("batch_id: {}".format(str(json_data["id"])+"/"+str(json_data["batch"][0]["start"])))
-    logging.info("len: {}".format(json_data["len"]))
     try:
+        logging.info("Se recibió un batch")
+        logging.info("batch_id: {}".format(str(json_data["id"])+"/"+str(json_data["batch"][0]["start"])))
+        logging.info("len: {}".format(json_data["len"]))
         for data in json_data["batch"]:
             event = Lectura(**data)
             event.validate()
@@ -67,6 +67,10 @@ def guardarBatch(json_data, isHttp):
         if isHttp:
             return jsonify({"valido": "false", "razon": e.to_dict()}), 400
     except NotUniqueError as e:
+        logging.error(e)
+        if isHttp:
+            return jsonify({"valido": "false", "razon": str(e)}), 400
+    except Exception as e:
         logging.error(e)
         if isHttp:
             return jsonify({"valido": "false", "razon": str(e)}), 400
