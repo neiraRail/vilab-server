@@ -28,6 +28,9 @@ def guardarLectura(json_data):
     except NotUniqueError as e:
         logging.error(e)
         return jsonify({"valido": "false", "razon": str(e)}), 400
+    except Exception as e:
+        logging.error(e)
+        return jsonify({"valido": "false", "razon": str(e)}), 400
     
     logging.info("delta: {}".format(json_data["delta"]))
     return jsonify(event.to_json())
@@ -57,6 +60,9 @@ def guardarBatch(json_data):
         logging.error(e)
         return jsonify({"valido": "false", "razon": e.to_dict()}), 400
     except NotUniqueError as e:
+        logging.error(e)
+        return jsonify({"valido": "false", "razon": str(e)}), 400
+    except Exception as e:
         logging.error(e)
         return jsonify({"valido": "false", "razon": str(e)}), 400
     
