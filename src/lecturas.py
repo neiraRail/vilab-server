@@ -99,7 +99,9 @@ def recieve_lectura_udp(sock):
 
             # Convert bytes to JSON
             logging.info("Recieved message from UDP client")
-            json_data = json.loads(data.decode())
+            json_raw = data.decode()
+            logging.info(json_raw)
+            json_data = json.loads(json_raw)
             if "batch" in json_data:
                 response = guardarBatch(json_data, False)
             else:
