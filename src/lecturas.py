@@ -4,6 +4,7 @@ from datetime import datetime
 import time
 import logging
 from mongoengine.errors import NotUniqueError, ValidationError, FieldDoesNotExist
+from threading import Thread
 
 from src.models.lectura import Lectura
 from src.procesado import baseProceso
@@ -53,7 +54,10 @@ def guardarBatch(json_data, isHttp):
             "batch_id": json_data["id"],
             "batch": json_data["batch"]
         }
-        executor.submit(baseProceso.procesar_segun_config, identifier)
+        if isHttp:
+            executor.submit(baseProceso.procesar_segun_config, identifier)
+        else:
+            Thread(target=baseProceso.procesar_segun_config, args=(identifier,)).start()
     except FieldDoesNotExist as e:
         logging.error(e)
         if isHttp:
