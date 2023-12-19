@@ -78,6 +78,7 @@ def mqtt_server():
         client.subscribe("lab/#")
     
     def on_message(client, userdata, msg):
+        logging.info("Recieved message from MQTT broker")
         recieve_lectura_mqtt(client, userdata, msg)
 
     client.on_connect = on_connect
