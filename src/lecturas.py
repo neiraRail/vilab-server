@@ -14,28 +14,29 @@ bp = Blueprint(
     __name__,
 )
 
-def guardarLectura(json_data):
+def guardarLectura(json_data, isHttp):
     try:
         event = Lectura(**json_data)
         event.validate()
         event.save()
     except FieldDoesNotExist as e:
         logging.error(e)
-        return jsonify({"valido": "false", "razon": str(e)}), 400
+        if isHttp:
+            return jsonify({"valido": "false", "razon": str(e)}), 400
     except ValidationError as e:
         logging.error(e)
-        return jsonify({"valido": "false", "razon": e.to_dict()}), 400
+        if isHttp:
+            return jsonify({"valido": "false", "razon": e.to_dict()}), 400
     except NotUniqueError as e:
         logging.error(e)
-        return jsonify({"valido": "false", "razon": str(e)}), 400
-    except Exception as e:
-        logging.error(e)
-        return jsonify({"valido": "false", "razon": str(e)}), 400
+        if isHttp:
+            return jsonify({"valido": "false", "razon": str(e)}), 400
     
     logging.info("delta: {}".format(json_data["delta"]))
-    return jsonify(event.to_json())
+    if isHttp:
+        return jsonify(event.to_json())
 
-def guardarBatch(json_data):
+def guardarBatch(json_data, isHttp):
     logging.info("Se recibió un batch")
     logging.info("batch_id: {}".format(str(json_data["id"])+"/"+str(json_data["batch"][0]["start"])))
     logging.info("len: {}".format(json_data["len"]))
@@ -55,27 +56,28 @@ def guardarBatch(json_data):
         executor.submit(baseProceso.procesar_segun_config, identifier)
     except FieldDoesNotExist as e:
         logging.error(e)
-        return jsonify({"valido": "false", "razon": str(e)}), 400
+        if isHttp:
+            return jsonify({"valido": "false", "razon": str(e)}), 400
     except ValidationError as e:
         logging.error(e)
-        return jsonify({"valido": "false", "razon": e.to_dict()}), 400
+        if isHttp:
+            return jsonify({"valido": "false", "razon": e.to_dict()}), 400
     except NotUniqueError as e:
         logging.error(e)
-        return jsonify({"valido": "false", "razon": str(e)}), 400
-    except Exception as e:
-        logging.error(e)
-        return jsonify({"valido": "false", "razon": str(e)}), 400
+        if isHttp:
+            return jsonify({"valido": "false", "razon": str(e)}), 400
     
     logging.info("delta: {}".format(json_data["batch"][1]["delta"]))
-    return jsonify(True)
+    if isHttp:
+        return jsonify(True)
 
 @bp.route("", methods=(["POST"]))
 def recieve_lectura_http():
     json_data = request.json
     if "batch" in json_data:
-        return guardarBatch(json_data)
+        return guardarBatch(json_data, True)
     else:
-        return guardarLectura(json_data)
+        return guardarLectura(json_data, True)
 
 
 def recieve_lectura_udp(sock):
@@ -87,18 +89,18 @@ def recieve_lectura_udp(sock):
         logging.info("Recieved message from UDP client")
         json_data = json.loads(data.decode())
         if "batch" in json_data:
-            guardarBatch(json_data)
+            response = guardarBatch(json_data, False)
         else:
-            guardarLectura(json_data)
+            response = guardarLectura(json_data, False)
 
 
 def recieve_lectura_mqtt(client, userdata, msg):
     # reloj = time.perf_counter_ns()
     json_data = json.loads(msg.payload.decode())
     if "batch" in json_data:
-        guardarBatch(json_data)
+        guardarBatch(json_data, False)
     else:
-        guardarLectura(json_data)
+        guardarLectura(json_data, False)
 
 
 @bp.route("", methods=(["GET"]))
