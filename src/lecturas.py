@@ -58,6 +58,7 @@ def guardarBatch(json_data, isHttp):
             executor.submit(baseProceso.procesar_segun_config, identifier)
         else:
             Thread(target=baseProceso.procesar_segun_config, args=(identifier,)).start()
+        logging.info("delta: {}".format(json_data["batch"][1]["delta"]))
     except FieldDoesNotExist as e:
         logging.error(e)
         if isHttp:
@@ -74,41 +75,49 @@ def guardarBatch(json_data, isHttp):
         logging.error(e)
         if isHttp:
             return jsonify({"valido": "false", "razon": str(e)}), 400
-    
-    logging.info("delta: {}".format(json_data["batch"][1]["delta"]))
     if isHttp:
         return jsonify(True)
 
 @bp.route("", methods=(["POST"]))
 def recieve_lectura_http():
-    json_data = request.json
-    if "batch" in json_data:
-        return guardarBatch(json_data, True)
-    else:
-        return guardarLectura(json_data, True)
+    try:
+        json_data = request.json
+        if "batch" in json_data:
+            return guardarBatch(json_data, True)
+        else:
+            return guardarLectura(json_data, True)
+    except Exception as e:
+        logging.error(e)
+        return jsonify({"valido": "false", "razon": str(e)}), 400
 
 
 def recieve_lectura_udp(sock):
     while True:
-        data, addr = sock.recvfrom(1024)
-        # reloj = time.perf_counter_ns()
+        try:
+            data, addr = sock.recvfrom(1024)
+            # reloj = time.perf_counter_ns()
 
-        # Convert bytes to JSON
-        logging.info("Recieved message from UDP client")
-        json_data = json.loads(data.decode())
-        if "batch" in json_data:
-            response = guardarBatch(json_data, False)
-        else:
-            response = guardarLectura(json_data, False)
+            # Convert bytes to JSON
+            logging.info("Recieved message from UDP client")
+            json_data = json.loads(data.decode())
+            if "batch" in json_data:
+                response = guardarBatch(json_data, False)
+            else:
+                response = guardarLectura(json_data, False)
+        except Exception as e:
+            logging.error(e)
 
 
 def recieve_lectura_mqtt(client, userdata, msg):
-    # reloj = time.perf_counter_ns()
-    json_data = json.loads(msg.payload.decode())
-    if "batch" in json_data:
-        guardarBatch(json_data, False)
-    else:
-        guardarLectura(json_data, False)
+    try:
+        # reloj = time.perf_counter_ns()
+        json_data = json.loads(msg.payload.decode())
+        if "batch" in json_data:
+            guardarBatch(json_data, False)
+        else:
+            guardarLectura(json_data, False)
+    except Exception as e:
+        logging.error(e)
 
 
 @bp.route("", methods=(["GET"]))
