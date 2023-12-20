@@ -96,6 +96,7 @@ def recieve_lectura_udp(sock):
         try:
             # reloj = time.perf_counter_ns()
             logging.info("Recieved message from UDP client")
+            json_raw = ""
             while True:
                 data, addr = sock.recvfrom(1024)
                 json_raw += data
