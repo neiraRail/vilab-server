@@ -94,16 +94,16 @@ def recieve_lectura_http():
 def recieve_lectura_udp(sock):
     while True:
         try:
-            data, addr = sock.recvfrom(1024)
             # reloj = time.perf_counter_ns()
-            # Convert bytes to JSON
             logging.info("Recieved message from UDP client")
-            json_raw = data.decode()
-
-            #If the message does not ends in "]}" wait for another package and append it
-            while json_raw[-2:] != "]}" and json_raw[:4] == "{\"id":
+            while True:
                 data, addr = sock.recvfrom(1024)
-                json_raw += data.decode()
+                json_raw += data
+                if len(data) < 1024:
+                    break
+            # while json_raw[-2:] != "]}" and json_raw[:4] == "{\"id":
+            #     data, addr = sock.recvfrom(1024)
+            #     json_raw += data.decode()
             logging.info(json_raw)
             
             json_data = json.loads(json_raw)
