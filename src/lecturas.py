@@ -101,7 +101,7 @@ def recieve_lectura_udp(sock):
             json_raw = data.decode()
 
             #If the message does not ends in "]}" wait for another package and append it
-            while json_raw[-2:] != "]}":
+            while json_raw[-2:] != "]}" and json_raw[:4] == "{\"id":
                 data, addr = sock.recvfrom(1024)
                 json_raw += data.decode()
             logging.info(json_raw)
